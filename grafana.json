@@ -1,0 +1,1093 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Terminal Name metric",
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "iteration": 1627290585859,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "tags": [],
+      "title": "Dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "aliasColors": {
+        "value": "semi-dark-yellow"
+      },
+      "bars": false,
+      "cacheTimeout": null,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "PostgreSQL-Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 21,
+        "w": 19,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [
+        {
+          "url": "/"
+        }
+      ],
+      "nullPointMode": "null as zero",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": true,
+      "pluginVersion": "7.3.7",
+      "pointradius": 0.5,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "value",
+          "lines": true,
+          "linewidth": 1,
+          "yaxis": 2
+        },
+        {
+          "alias": "value",
+          "color": "rgba(50, 116, 217, 0.6)",
+          "fillGradient": 9
+        },
+        {
+          "alias": "AVO_START",
+          "color": "#73BF69"
+        },
+        {
+          "alias": "AVO_END",
+          "color": "#E0B400"
+        },
+        {
+          "alias": "MEASUREMENT",
+          "color": "rgb(111, 212, 255)"
+        },
+        {
+          "alias": "INTERLOCK",
+          "color": "#f3863c"
+        },
+        {
+          "alias": "LINK_SNR",
+          "color": "#e64e42"
+        },
+        {
+          "alias": "INPUT_UNIKAT",
+          "color": "#1e7ac4"
+        },
+        {
+          "alias": "ASK_SNR",
+          "color": "#bd43ac"
+        },
+        {
+          "alias": "MEASUREMENT_FILE_LONG",
+          "color": "#715ea2"
+        },
+        {
+          "alias": "NEXT_STEP",
+          "color": "#518842"
+        },
+        {
+          "alias": "GUI_START_WO",
+          "color": "#d0a600"
+        },
+        {
+          "alias": "PLC_END_WO",
+          "color": "#4480bf"
+        },
+        {
+          "alias": "REQUEST_SETUP",
+          "color": "#c45d16"
+        },
+        {
+          "alias": "MEASUREMENT_FILE",
+          "color": "#8b0e01"
+        },
+        {
+          "alias": "INPUT_MAT_EXT",
+          "color": "#1F60C4"
+        },
+        {
+          "alias": "PLC_SETUP",
+          "color": "#B877D9"
+        },
+        {
+          "alias": "INPUT_UNIQUE",
+          "color": "#FFA6B0"
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "equipment_id_var",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  request_log_timestamp AS \"time\",\n  case when extract(epoch from response_delay)>10 then 10 else extract(epoch from response_delay) end,\n  coalesce(telegram_name_var,'UNKNOWN') as metric\nFROM telegram_ui_table\nWHERE\n  $__timeFilter(request_log_timestamp) \n  AND \"request_type\" in ($requesttype)\n  AND \"telegram_name_var\" in ($telegramnamevar)\n  AND \"terminal_name_var\" in ($terminalnamevar)\n  AND extract(epoch from response_delay) < 300\nORDER BY 1,3",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_log_timestamp"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "none"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telegram_ui_table",
+          "timeColumn": "request_log_timestamp",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH RECURSIVE  dates(var1, var2) as(\r\n\tVALUES(TO_TIMESTAMP($__timeFrom(),'YYYY-MM-DDTHH24:MI:SS') + INTERVAL '1 hour', TO_TIMESTAMP($__timeTo(),'YYYY-MM-DDTHH24:MI:SS') + INTERVAL '2 hour')\r\n),\r\ntheDATES AS(\r\n\tSELECT dates.var1 as theDate\r\n\tFROM dates\r\n\tUNION ALL \r\n\tSELECT theDate + INTERVAL '1 Minute'\r\n\tFROM theDATES, dates\r\n\tWHERE theDate + INTERVAL '1 Minute' <= dates.var2\r\n),\r\ntheValue(ertek,dates) as(\r\nSELECT COUNT(*) as ertek, make_timestamp(extract(year from request_log_timestamp)::int,extract(month from request_log_timestamp)::int, extract(day from request_log_timestamp)::int, extract(hour from request_log_timestamp)::int, extract(minute from request_log_timestamp)::int,0::int) as timei\r\nFROM telegram_ui_table\r\nWHERE $__timeFilter(request_log_timestamp) and\r\ntelegram_name_var IN ($telegramnamevar)\r\nGROUP BY make_timestamp(extract(year from request_log_timestamp)::int,extract(month from request_log_timestamp)::int, extract(day from request_log_timestamp)::int, extract(hour from request_log_timestamp)::int, extract(minute from request_log_timestamp)::int,0)\r\n)\r\n\r\nSELECT theDate as time, COALESCE(theValue.ertek,0) as value\r\nFROM theDATES\r\nLEFT join theValue\r\non make_timestamp(extract(year from theDate)::int,extract(month from theDate)::int, extract(day from theDate)::int, extract(hour from theDate)::int, extract(minute from theDate)::int,0) = theValue.dates\r\nORDER BY theDate",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "yaxis": "left"
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Response times - Message Type metric",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "label": "response time",
+          "logBase": 1,
+          "max": "5",
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": "Telegram Pair / Minute",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "PostgreSQL-Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 2,
+          "mappings": [],
+          "max": 3,
+          "min": 0.4,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "dark-orange",
+                "value": 1.3
+              },
+              {
+                "color": "dark-red",
+                "value": 1.8
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 5,
+        "x": 19,
+        "y": 0
+      },
+      "id": 10,
+      "links": [],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "7.3.7",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  telegram_name_var AS \"Message Type\",\n  --count(*) as \"Count\",\n  avg(extract(epoch from response_delay)) as \"Average\"\nFROM telegram_ui_table\nWHERE\n  $__timeFilter(request_log_timestamp) \n  AND \"request_type\" in ($requesttype)\n  AND \"telegram_name_var\" = 'AVO_END'\n  AND \"terminal_name_var\" in ($terminalnamevar)\n  AND extract(epoch from response_delay) < 300\nGROUP BY telegram_name_var\nORDER BY 1\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "AVO_END average",
+      "type": "gauge"
+    },
+    {
+      "cacheTimeout": null,
+      "columns": [],
+      "datasource": "PostgreSQL-Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 19,
+        "y": 9
+      },
+      "id": 4,
+      "links": [],
+      "pageSize": 6,
+      "pluginVersion": "6.7.2",
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 1,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "",
+          "align": "auto",
+          "colorMode": "cell",
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "decimals": 3,
+          "link": false,
+          "pattern": "Average",
+          "thresholds": [
+            "2",
+            " 2.8"
+          ],
+          "type": "number",
+          "unit": "short"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DDTHH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "Count",
+          "thresholds": [],
+          "type": "number",
+          "unit": "locale"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  telegram_name_var AS \"Message Type\",\n  count(*) as \"Count\",\n  avg(extract(epoch from response_delay)) as \"Average\"\nFROM telegram_ui_table\nWHERE\n  $__timeFilter(request_log_timestamp) \n  AND \"request_type\" in ($requesttype)\n  AND \"telegram_name_var\" in ($telegramnamevar)\n  AND \"terminal_name_var\" in ($terminalnamevar)\n  AND extract(epoch from response_delay) < 300\nGROUP BY telegram_name_var\nORDER BY 1\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Response time averages",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "columns": [],
+      "datasource": "PostgreSQL-Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 19,
+        "y": 17
+      },
+      "id": 6,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DDTHH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "align": "auto",
+          "colorMode": "cell",
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "decimals": 2,
+          "pattern": "Average",
+          "thresholds": [
+            "1",
+            "3"
+          ],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  count(*) as \"Number of telegrams\",\n  avg(extract(epoch from response_delay)) as \"Average\"\nFROM telegram_ui_table\nWHERE\n  $__timeFilter(request_log_timestamp) \n  AND \"request_type\" in ($requesttype)\n  AND \"telegram_name_var\" in ($telegramnamevar)\n  AND \"terminal_name_var\" in ($terminalnamevar)\n  AND extract(epoch from response_delay) < 300\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Summary",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "columns": [],
+      "datasource": "PostgreSQL-Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 2,
+        "w": 5,
+        "x": 19,
+        "y": 20
+      },
+      "id": 14,
+      "pageSize": null,
+      "showHeader": true,
+      "sort": {
+        "col": null,
+        "desc": false
+      },
+      "styles": [
+        {
+          "alias": " ",
+          "align": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "dateFormat": "YYYY-MM-DDTHH:mm:ss",
+          "decimals": 1,
+          "link": false,
+          "mappingType": 1,
+          "pattern": "text",
+          "sanitize": false,
+          "thresholds": [
+            ""
+          ],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": " ",
+          "align": "auto",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DDTHH:mm:ss",
+          "decimals": 1,
+          "mappingType": 1,
+          "pattern": "value",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH RECURSIVE  dates(var1, var2) as(\r\n\tVALUES(TO_TIMESTAMP($__timeFrom(),'YYYY-MM-DDTHH24:MI:SS') + INTERVAL '2 hour', TO_TIMESTAMP($__timeTo(),'YYYY-MM-DDTHH24:MI:SS') + INTERVAL '2 hour')\r\n\t--  + INTERVAL '2 hour' has to be set to the timezone IN CASE OF (UTC +02:00) is should be  + INTERVAL '2 hour'\r\n),\r\ntheDATES AS(\r\n\tSELECT dates.var1 as theDate\r\n\tFROM dates\r\n\tUNION ALL \r\n\tSELECT theDate + INTERVAL '1 Minute'\r\n\tFROM theDATES, dates\r\n\tWHERE theDate + INTERVAL '1 Minute' <= dates.var2\r\n),\r\ntheValue(ertek,dates) as(\r\nSELECT COUNT(*) as ertek, make_timestamp(extract(year from request_log_timestamp)::int,extract(month from request_log_timestamp)::int, extract(day from request_log_timestamp)::int, extract(hour from request_log_timestamp)::int, extract(minute from request_log_timestamp)::int,0::int) as timei\r\nFROM telegram_ui_table\r\nWHERE $__timeFilter(request_log_timestamp) and\r\ntelegram_name_var IN ($telegramnamevar)\r\nGROUP BY make_timestamp(extract(year from request_log_timestamp)::int,extract(month from request_log_timestamp)::int, extract(day from request_log_timestamp)::int, extract(hour from request_log_timestamp)::int, extract(minute from request_log_timestamp)::int,0)\r\n)\r\n\r\nSELECT 'Average telegram count:' as Text ,(AVG((theValue.ertek)::int))::int as value\r\nFROM theDATES\r\nLEFT join theValue\r\non make_timestamp(extract(year from theDate)::int,extract(month from theDate)::int, extract(day from theDate)::int, extract(hour from theDate)::int, extract(minute from theDate)::int,0) = theValue.dates",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Microsoft SQL Server - Production",
+      "decimals": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 19,
+        "x": 0,
+        "y": 21
+      },
+      "hiddenSeries": false,
+      "id": 13,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.7",
+      "pointradius": 1,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "value",
+          "fillGradient": 9,
+          "lines": true,
+          "linewidth": 1,
+          "points": true,
+          "yaxis": 1
+        },
+        {
+          "alias": "warning",
+          "color": "#FF9830",
+          "fillGradient": 9,
+          "lines": true,
+          "linewidth": 1,
+          "yaxis": 1
+        },
+        {
+          "alias": "error",
+          "color": "#F2495C",
+          "fillGradient": 9,
+          "lines": true
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "format": "time_series",
+          "rawSql": "SELECT DATEADD(HOUR,-2,RowUpdated) AS 'time', MessageCount AS 'value',  CASE WHEN MessageCount > 2500 THEN MessageCount ELSE NULL END AS 'warning',  CASE WHEN MessageCount > 5000 THEN MessageCount ELSE NULL END AS 'error'\nFROM VES2PTS1.dbo.BarflowMessage\nWHERE RowUpdated BETWEEN DATEADD(HOUR,+2,$__timeFrom()) and DATEADD(HOUR,+2,$__timeTo())\n--WHERE $__timeFilter(RowUpdated)",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "warning",
+          "fill": false,
+          "line": true,
+          "op": "gt",
+          "value": 2500,
+          "yaxis": "left"
+        },
+        {
+          "colorMode": "critical",
+          "fill": false,
+          "line": true,
+          "op": "gt",
+          "value": 5000,
+          "yaxis": "left"
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "SIT-BC Backlog History",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "columns": [],
+      "datasource": "Microsoft SQL Server - Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 9,
+        "w": 5,
+        "x": 19,
+        "y": 22
+      },
+      "id": 11,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "",
+          "align": "auto",
+          "colorMode": "cell",
+          "colors": [
+            "#37872D",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "dateFormat": "YYYY-MM-DDTHH:mm:ss",
+          "decimals": 0,
+          "mappingType": 1,
+          "pattern": "count",
+          "thresholds": [
+            "50",
+            "500"
+          ],
+          "type": "number",
+          "unit": "none"
+        }
+      ],
+      "targets": [
+        {
+          "alias": "",
+          "format": "table",
+          "rawSql": "SELECT MESSAGE_TYPE, COUNT(MESSAGE_TYPE) as 'count' FROM [ARCH_T_SitMesComponentRT1A8997AF-5067-47d5-80DB-AF14C4BD2402/EC_SAP_TRANSFER_$118$] nolock\nWHERE SENT = 0 and MESSAGE_TYPE in ('GOODS_RECEIPT', 'GOODS_MOVEMENT', 'BACKFLUSH')\nGROUP BY MESSAGE_TYPE\nOPTION (MAXDOP 1)\n",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "DIS Connector SIT-BC Backlog",
+      "transform": "table",
+      "type": "table-old"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Microsoft SQL Server - Production",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "hiddenSeries": false,
+      "id": 16,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "sideWidth": 400,
+        "total": true,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.7",
+      "pointradius": 0.5,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "/.*Blocking.*/",
+          "pointradius": 4
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "format": "time_series",
+          "hide": false,
+          "rawSql": "SELECT DATEADD(HOUR, -2, [collection_time]) AS time, \r\n(\t\r\n\tCAST(LEFT(RIGHT([dd hh:mm:ss.mss], 12),2) AS float)*3600 \r\n\t+ CAST(LEFT(RIGHT([dd hh:mm:ss.mss], 9),2) AS float)*60 \r\n\t+ CAST(RIGHT([dd hh:mm:ss.mss], 6) AS float)\r\n) AS 'Running time (s)'\r\n, [login_name]\r\nFROM [DBMaintenance].[dbo].[WhoIsActive] (NOLOCK)\r\nWHERE $__timeFrom() < DATEADD(HOUR, -2, [collection_time])\r\nAND $__timeTo() > DATEADD(HOUR, -2, [collection_time])\r\nand [dd hh:mm:ss.mss] != '00 00:00:03.000'\r\nand [dd hh:mm:ss.mss] != '00 00:00:06.000'\r\nand [dd hh:mm:ss.mss] != '00 00:00:00.000'\r\nOPTION (MAXDOP 1)",
+          "refId": "A"
+        },
+        {
+          "alias": "",
+          "format": "time_series",
+          "rawSql": "SELECT DATEADD(HOUR, -2, [collection_time]) AS time, \r\n(\t\r\n\tCAST(LEFT(RIGHT([dd hh:mm:ss.mss], 12),2) AS float)*3600 \r\n\t+ CAST(LEFT(RIGHT([dd hh:mm:ss.mss], 9),2) AS float)*60 \r\n\t+ CAST(RIGHT([dd hh:mm:ss.mss], 6) AS float)\r\n) AS 'Running time (s)'\r\n, CONCAT( [login_name], '  Blocking ID: ', [blocking_session_id] )\r\nFROM [DBMaintenance].[dbo].[WhoIsActive] (NOLOCK)\r\nWHERE $__timeFrom() < DATEADD(HOUR, -2, [collection_time])\r\nAND $__timeTo() > DATEADD(HOUR, -2, [collection_time])\r\nAND blocking_session_id is not null\r\nOPTION (MAXDOP 1)",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "WhoIsActive DB Data",
+      "tooltip": {
+        "shared": false,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 2,
+          "format": "s",
+          "label": null,
+          "logBase": 2,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "PostgreSQL-Production",
+        "definition": "select name from telegram_types where name<>'LIFE_BEAT'",
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "Telegram Type",
+        "multi": true,
+        "name": "telegramnamevar",
+        "options": [],
+        "query": "select name from telegram_types where name<>'LIFE_BEAT'",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "PostgreSQL-Production",
+        "definition": "select terminal_name from ec_terminal_mapping union select 'unknown'",
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "Terminal Name",
+        "multi": true,
+        "name": "terminalnamevar",
+        "options": [],
+        "query": "select terminal_name from ec_terminal_mapping union select 'unknown'",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "PostgreSQL-Production",
+        "definition": "select 'xml' union select 'txt'",
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "Protocol",
+        "multi": true,
+        "name": "requesttype",
+        "options": [],
+        "query": "select 'xml' union select 'txt'",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Production Data",
+  "uid": "5hM3w-mZz",
+  "version": 5
+}
